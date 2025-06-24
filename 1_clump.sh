@@ -7,7 +7,7 @@
 exp="metabolite_id"
 
 # create file only containing GWAS significant (p<5e-8) SNPs
-Rscript find_gwas_sig_snps.R /path/to/metabolite/exposures/${exp}/summary_stats.tsv ${exp}
+Rscript 1a_find_gwas_sig_snps.R /path/to/metabolite/exposures/${exp}/summary_stats.tsv ${exp}
 
 for chr in $(seq 1 22)
 do

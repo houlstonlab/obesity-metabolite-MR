@@ -45,8 +45,6 @@ fi
 
 cd ${cancers[$i]}
 
-cp ${home_dir}/mr.R ./
-
 cat << EOF > mr.sh
 #!/bin/bash
 
@@ -58,7 +56,7 @@ cat << EOF > mr.sh
 #SBATCH --output=${cancers[$i]}%j.o
 #SBATCH --error=${cancers[$i]}%j.e
 
-Rscript ${home_dir}/${cancers[$i]}/mr.R ${cancers[$i]} ${liferisks[$i]} ${ncases[$i]} ${ncontrols[$i]} ${summarys[$i]} ${pvals[$i]}
+Rscript 2a_mr.R ${cancers[$i]} ${liferisks[$i]} ${ncases[$i]} ${ncontrols[$i]} ${summarys[$i]} ${pvals[$i]}
 EOF
 
 sbatch mr.sh

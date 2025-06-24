@@ -13,7 +13,7 @@ ncontrols=86854
 cd /path/to/metabolite/exposures/${exp}/
 
 # create list of independent SNPs and corresponding GWAS data
-Rscript find_ind_snp.R /path/to/metabolite/exposures/ ${exp}
+Rscript 5a_find_ind_snp.R /path/to/metabolite/exposures/ ${exp}
 
 # calculate LD r^2 values for each independent SNP
 for chr in $(seq 1 22)
@@ -34,7 +34,7 @@ cat r2_chr${chr}.ld | awk 'NR>1' >> r2_combined.ld
 
 done
 
-Rscript coloc.R /path/to/metabolite/exposures/${exp} \
+Rscript 5b_coloc.R /path/to/metabolite/exposures/${exp} \
                 ${exp} \
                 summary_stats_chr \
                 /path/to/${cancer}/GWAS/summary_stats.tsv ${ncases} ${ncontrols}
