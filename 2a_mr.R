@@ -253,16 +253,9 @@ leave_one_out_flag_pval <- 0.05
 # flag exposures based on sensitivity analysis results
 exposures_flags <- list()
 exposures_flags$few_snps <- mr_res$exposure[mr_res$nsnp < snp_flag_min]
-# ifelse statement hopefully ensures column headers are written even when
-# the particular test could not be run
-exposures_flags$pleio <-
-	ifelse(pleio$exposure[pleio$pval < egger_flag_pval & !is.na(pleio$pval)] != NULL,
-	pleio$exposure[pleio$pval < egger_flag_pval & !is.na(pleio$pval)], NA)
-exposures_flags$heterogeneity <-
-    ifelse(het$exposure[het$method == "Inverse variance weighted" & het$Q_pval <
-	heterogeneity_flag_pval & !is.na(het$Q_pval)] != NULL,
-	het$exposure[het$method == "Inverse variance weighted" & het$Q_pval <
-	heterogeneity_flag_pval & !is.na(het$Q_pval)], NA)
+exposures_flags$pleio <- pleio$exposure[!is.na(pleio$pval) & pleio$pval < egger_flag_pval]
+exposures_flags$heterogeneity <- het$exposure[het$method == "Inverse variance weighted" &
+        !is.na(het$Q_pval) & het$Q_pval < heterogeneity_flag_pval]
 
 # function to identify exposures to flag due to leave-one-out sensitivity analysis
 # if pval < p when all SNPs considered, but the removal of any single results in pval > p, then flag
@@ -278,10 +271,11 @@ identify.leave.one.out.flag <- function(res, p) {
 exposures_flags$leave_one_out_ivw <- identify.leave.one.out.flag(loo, leave_one_out_flag_pval)
 
 # join flags to mr results and write out table
-for (flag in names(exposures_flags)) mr_res[[paste("flag", flag, sep = ".")]] <-
-	mr_res$exposure %in% exposures_flags[[flag]]
+flag.names <- c("few_snps", "pleio", "heterogeneity", "leave_one_out_ivw")
+for (flag in flag.names) mr_res[[paste("flag", flag, sep = ".")]] <-
+        mr_res$exposure %in% exposures_flags[[flag]]   # NULL or empty -> FALSE
 # change value of flags for exposure with nsnp < 2 to NA from FALSE as these
 # tests cannot be run with fewer than 2 SNPs
-mr_res[["flag.pleio"]][mr_res$nsnp < 2] <- NA
-mr_res[["flag.heterogeneity"]][mr_res$nsnp < 2] <- NA
+mr_res$flag.heterogeneity[mr.res$nsnp < 2] <- NA
+mr_res$flag.pleio[mr.res$nsnp < 3] <- NA
 write_tsv(mr_res, paste0(outdir, cancer, "_flagged_results_mr_all.txt"))
